@@ -1,0 +1,6 @@
+flask
+gradio
+pdf2image
+pytesseract
+sentence-transformers==2.2.2
+faiss-cpu

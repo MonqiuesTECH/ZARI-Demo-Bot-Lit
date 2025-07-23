@@ -19,7 +19,7 @@ def extract_text_with_ocr(pdf_path):
             text += page_text + "\n\n"
     return text
 
-ocr_text = extract_text_with_ocr("ZARI-Client-Pitch-Deck.pdf")
+ocr_text = extract_text_with_ocr("What is ZARI.pdf")
 chunks = ocr_text.split("\n\n")[:10]  # Limit to 10 chunks
 
 embedder = SentenceTransformer("paraphrase-MiniLM-L3-v2")

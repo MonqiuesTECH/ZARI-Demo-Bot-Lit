@@ -21,5 +21,3 @@ demo = gr.Interface(
     title="ZARI Agent",
     description="Ask ZARI Agent about your business, ops, or automation strategy."
 )
-
-app = demo.launch(inline=False, share=False)

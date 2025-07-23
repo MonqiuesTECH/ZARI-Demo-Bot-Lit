@@ -30,4 +30,4 @@ index.add(np.array(embeddings))
 def ask_zari(query):
     query_vec = embedder.encode([query])
     _, I = index.search(np.array(query_vec), k=1)
-    return chunks[I[0][0]]
+    return chunks[I[0][0]].strip().encode('ascii', 'ignore').decode()

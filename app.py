@@ -1,15 +1,13 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect
 from zari_bot_voice import ask_zari
 import gradio as gr
-from gradio.routes import mount_gradio_app
 
 app = Flask(__name__)
 
-# Wrapper for Gradio logic
+# Gradio interface
 def chat_with_zari(question):
     return ask_zari(question)
 
-# Gradio UI
 demo = gr.Interface(
     fn=chat_with_zari,
     inputs=gr.Textbox(lines=2, placeholder="Ask ZARI anything..."),
@@ -18,28 +16,31 @@ demo = gr.Interface(
     description="Ask ZARI about your business, ops, or automation strategy."
 )
 
-# Mount Gradio at /gradio
-mount_gradio_app(app, demo, path="/gradio")
-
-# API access
+# API route
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
     question = data.get("question", "")
     return jsonify({"answer": ask_zari(question)})
 
-# Root HTML page
+# HTML landing page
 @app.route("/")
 def index():
-    return '''
+    return """
     <html>
-        <head><title>ZARI Lite</title></head>
-        <body>
-            <h2>ZARI is running</h2>
-            <p><a href="/gradio">Click here to open the UI</a></p>
-        </body>
+      <head><title>ZARI Agent</title></head>
+      <body>
+        <h1>ZARI Lite is running.</h1>
+        <p>Click to launch: <a href='/gradio'>Open ZARI UI</a></p>
+      </body>
     </html>
-    '''
+    """
 
+# Gradio route
+@app.route("/gradio")
+def gradio():
+    return demo.launch(share=False, inline=True, inbrowser=False, prevent_thread_lock=True)
+
+# Run app
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)

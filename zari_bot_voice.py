@@ -4,10 +4,9 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 import faiss
 
-# Load and extract text from all pages
 def extract_text_from_pdf(pdf_path):
     with pdfplumber.open(pdf_path) as pdf:
-        text = "\n\n".join(page.extract_text() or "" for page in pdf)
+        text = "\n\n".join(page.extract_text() or "" for page in pdf.pages)
     return text
 
 # Chunking helper (simple newline-based for now)

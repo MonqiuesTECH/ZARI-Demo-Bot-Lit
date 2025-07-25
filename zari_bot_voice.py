@@ -1,33 +1,38 @@
-from pdf2image import convert_from_path
-import pytesseract
-import tempfile
+import pdfplumber
 import os
-
+import numpy as np
 from sentence_transformers import SentenceTransformer
 import faiss
-import numpy as np
 
-# OCR + Embedding
-def extract_text_with_ocr(pdf_path):
-    with tempfile.TemporaryDirectory() as temp_dir:
-        images = convert_from_path(pdf_path, first_page=1, last_page=2)  # Only first 2 pages
-        text = ""
-        for i, image in enumerate(images):
-            image_path = os.path.join(temp_dir, f"page_{i}.png")
-            image.save(image_path, "PNG")
-            page_text = pytesseract.image_to_string(image)
-            text += page_text + "\n\n"
+# Load and extract text from all pages
+def extract_text_from_pdf(pdf_path):
+    with pdfplumber.open(pdf_path) as pdf:
+        text = "\n\n".join(page.extract_text() or "" for page in pdf)
     return text
 
-ocr_text = extract_text_with_ocr("What is ZARI.pdf")
-chunks = ocr_text.split("\n\n")[:10]  # Limit to 10 chunks
+# Chunking helper (simple newline-based for now)
+def chunk_text(text, max_chunks=10):
+    raw_chunks = text.strip().split("\n\n")
+    return raw_chunks[:max_chunks]
 
+# Load model once
 embedder = SentenceTransformer("paraphrase-MiniLM-L3-v2")
+
+# Prepare embeddings (only on startup)
+document_text = extract_text_from_pdf("What is ZARI.pdf")
+chunks = chunk_text(document_text)
+
 embeddings = embedder.encode(chunks)
-index = faiss.IndexFlatL2(embeddings[0].shape[0])
+index = faiss.IndexFlatL2(embeddings.shape[1])
 index.add(np.array(embeddings))
 
+# Query logic
 def ask_zari(query):
     query_vec = embedder.encode([query])
-    _, I = index.search(np.array(query_vec), k=1)
-    return chunks[I[0][0]].strip().encode('ascii', 'ignore').decode()
+    D, I = index.search(np.array(query_vec), k=1)
+    score = D[0][0]
+
+    if score > 2.0:  # Adjustable threshold — lower = stricter
+        return "I'm not confident in my answer. Can you rephrase that?"
+
+    return chunks[I[0][0]]

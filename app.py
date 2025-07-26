@@ -11,11 +11,14 @@ demo = gr.Interface(
     title="ZARI Agent",
     description="Ask ZARI about your business, ops, or automation strategy."
 )
+
 @app.route("/")
 def index():
     return '''
         <h1>ZARI is live.</h1>
         <p><a href="/gradio">Launch UI</a></p>
+    '''
+
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
@@ -23,8 +26,6 @@ def chat():
     return jsonify({"answer": ask_zari(question)})
 
 if __name__ == "__main__":
-    import gradio.routes
     from gradio.routes import mount_gradio_app
-
     app = mount_gradio_app(app, demo, path="/gradio")
     app.run(host="0.0.0.0", port=8000)

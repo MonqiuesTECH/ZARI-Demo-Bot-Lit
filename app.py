@@ -4,7 +4,6 @@ import gradio as gr
 
 app = Flask(__name__)
 
-# Create Gradio interface
 demo = gr.Interface(
     fn=ask_zari,
     inputs=gr.Textbox(lines=2, placeholder="Ask ZARI anything..."),
@@ -12,7 +11,6 @@ demo = gr.Interface(
     title="ZARI Agent",
     description="Ask ZARI about your business, ops, or automation strategy."
 )
-# Mount Gradio to a Flask route (works on single port!)
 @app.route("/")
 def index():
     return '''
@@ -24,7 +22,6 @@ def chat():
     question = data.get("question", "")
     return jsonify({"answer": ask_zari(question)})
 
-# Run Flask app and mount Gradio app
 if __name__ == "__main__":
     import gradio.routes
     from gradio.routes import mount_gradio_app

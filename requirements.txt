@@ -1,8 +1,9 @@
 flask
-gradio
+gradio==4.25.0
 pdf2image
 pytesseract
 sentence-transformers==2.2.2
 faiss-cpu
 huggingface_hub==0.16.4
 pdfplumber
+numpy

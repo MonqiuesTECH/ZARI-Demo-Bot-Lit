@@ -22,10 +22,11 @@ def chat():
 @app.route("/")
 def index():
     return '''
-        <h1>ZARI is live.</h1>
-        <p><a href="/gradio">Launch UI</a></p>
+    <h1>ZARI is live.</h1>
+    <p><a href="/gradio">Launch UI</a></p>
     '''
 
+app = mount_gradio_app(app, demo, path="/gradio")
+
 if __name__ == "__main__":
-    app = mount_gradio_app(app, demo, path="/gradio")
     app.run(host="0.0.0.0", port=8000)
